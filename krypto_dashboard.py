@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 import yfinance as yf
 import datetime
@@ -20,11 +21,16 @@ data = yf.download(selected_token, start=start_date, end=end_date)
 data.dropna(inplace=True)
 
 if not data.empty and 'Close' in data.columns:
-    # --- Teknisk analyse: RSI og MACD ---
-    data['RSI'] = RSIIndicator(close=data['Close']).rsi()
-    macd = MACD(close=data['Close'])
-    data['MACD'] = macd.macd()
-    data['MACD_signal'] = macd.macd_signal()
+    try:
+        # --- Teknisk analyse: RSI og MACD ---
+        close_series = data['Close'].astype(float)
+        data['RSI'] = RSIIndicator(close=close_series).rsi()
+        macd = MACD(close=close_series)
+        data['MACD'] = macd.macd()
+        data['MACD_signal'] = macd.macd_signal()
+    except Exception as e:
+        st.error(f"🚫 Fejl ved teknisk analyse: {e}")
+        st.stop()
 
     # --- Candlestick graf ---
     st.subheader("📈 Pris og candlestick-graf")
@@ -76,5 +82,3 @@ if not data.empty and 'Close' in data.columns:
 else:
     st.error("❌ Ingen data hentet – prøv en anden dato eller kryptovaluta.")
     st.stop()
-
-
