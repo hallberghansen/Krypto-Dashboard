@@ -20,7 +20,15 @@ data = yf.download(selected_token, start=start_date, end=end_date)
 data.dropna(inplace=True)
 
 # --- Teknisk analyse: RSI og MACD ---
-data['RSI'] = RSIIndicator(close=data['Close']).rsi()
+if not data.empty and 'Close' in data.columns:
+    data['RSI'] = RSIIndicator(close=data['Close']).rsi()
+    macd = MACD(close=data['Close'])
+    data['MACD'] = macd.macd()
+    data['MACD_signal'] = macd.macd_signal()
+else:
+    st.error("❌ Ingen data hentet – prøv en anden dato eller symbol.")
+    st.stop()
+
 macd = MACD(close=data['Close'])
 data['MACD'] = macd.macd()
 data['MACD_signal'] = macd.macd_signal()
