@@ -23,7 +23,10 @@ data.dropna(inplace=True)
 if not data.empty and 'Close' in data.columns:
     try:
         # --- Teknisk analyse: RSI og MACD ---
-        close_series = data['Close'].astype(float)
+        close_series = data['Close'].astype(float).squeeze()
+        if close_series.ndim > 1:
+            close_series = close_series.iloc[:, 0]  # reducer til 1D hvis nødvendigt
+
         data['RSI'] = RSIIndicator(close=close_series).rsi()
         macd = MACD(close=close_series)
         data['MACD'] = macd.macd()
