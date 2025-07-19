@@ -77,3 +77,4 @@ else:
     st.error("❌ Ingen data hentet – prøv en anden dato eller kryptovaluta.")
     st.stop()
 
+
